@@ -1,32 +1,44 @@
-import { useSelector, useDispatch } from 'react-redux'
-import { voteOf } from '../reducers/anecdoteReducer'
+import React from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { voteOf } from '../reducers/anecdoteReducer';
+import { setFilter } from '../reducers/filterReducer';
+import Filter from '../components/Filter'
 
 const AnecdoteList = () => {
-    const dispatch = useDispatch()
+  const anecdotes = useSelector(state => state.anecdotes);
+  const filterValue = useSelector(state => state.filter);
+  const dispatch = useDispatch();
 
-    const anecdotes = useSelector(state => {
-        return state.sort((a, b) => b.votes - a.votes)
-        } )
+  const handleChange = (event) => {
+    const filterValue = event.target.value
+    dispatch(setFilter(filterValue))
+  }
 
-    const vote = (id) => {
-            dispatch(voteOf(id))
-          }
+  const filteredAnecdotes = anecdotes.filter(anecdote => {
+    return anecdote.content.toLowerCase().includes(filterValue.toLowerCase());
+  });
 
-    return (
-        <>
-            {anecdotes.map(anecdote =>
-                <div key={anecdote.id}>
-                <div>
-                    {anecdote.content}
-                </div>
-                <div>
-                    has {anecdote.votes}
-                    <button onClick={() => vote(anecdote.id)}>vote</button>
-                </div>
-                </div>
-            )}
-          </>
-    )
-}
+  const sortedAnecdotes = filteredAnecdotes.sort(
+    (a, b) => b.votes - a.votes
+  );
 
-export default AnecdoteList
+  const handleVote = (id) => {
+    dispatch(voteOf(id));
+  };
+  return (
+    <div>
+      <Filter onChange={handleChange} />
+      {sortedAnecdotes.map(anecdote => (
+        <div key={anecdote.id}>
+          <div>{anecdote.content}</div>
+          <div>
+            has {anecdote.votes}
+            <button onClick={() => handleVote(anecdote.id)}>vote</button>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+export default AnecdoteList;
