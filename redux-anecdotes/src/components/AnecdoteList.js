@@ -2,7 +2,7 @@ import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { voteOf } from '../reducers/anecdoteReducer';
 import { setFilter } from '../reducers/filterReducer';
-import Filter from '../components/Filter';
+import Filter from './Filter';
 import { setNotification } from '../reducers/notificationReducer';
 import Notification from './Notification';
 
@@ -18,9 +18,13 @@ const AnecdoteList = () => {
   };
 
   const filteredAnecdotes = anecdotes.filter(anecdote => {
-    return anecdote.content.toLowerCase().includes(filterValue.toLowerCase());
+    const content = anecdote.content;
+    if (typeof content !== 'string') {
+      return false;
+    }
+    return content.toLowerCase().includes(filterValue.toLowerCase());
   });
-
+  
   const sortedAnecdotes = filteredAnecdotes.sort(
     (a, b) => b.votes - a.votes
   );
